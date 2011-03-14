@@ -1,0 +1,15 @@
+2010-08-16  Michael Granger  <ged@FaerieMUD.org>
+
+	* hg-statall:
+	Adding options, omit clean repos by default
+	[317467db6bc7] [tip]
+
+2010-08-09  Michael Granger  <ged@FaerieMUD.org>
+
+	* hg-statall:
+	Adding colorization
+	[39b15b408764]
+
+	* .hgignore, hg-statall:
+	Adding the ignorelist and hg-statall
+	[a611ff172483]

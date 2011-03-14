@@ -1,0 +1,5 @@
+ChangeLog
+History.md
+README.md
+Rakefile
+lib/hoe/deveiate.rb
