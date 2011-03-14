@@ -2,6 +2,7 @@
 
 require 'tmail'
 require 'net/smtp'
+require 'openssl'
 
 # This gem depends on the prompts and stuff from hoe-highline
 Hoe.plugin :highline
@@ -26,17 +27,23 @@ module Hoe::Deveiate
 	def initialize_deveiate
 		self.hg_sign_tags = true
 
-		@email_to = nil
+		@email_to = []
+		@email_from = nil
 
 	    with_config do |config, _|
 			self.spec_extras[:signing_key] = config['signing_key_file'] or
 				abort "no signing key ('signing_key_file') configured."
-			@email_conf = config['email']
+			@email_config = config['email']
+			@email_to = Array( @email_config['to'] )
 	    end
 	end
 
 
-	attr_accessor :email_to
+	# Where to send announcement emails
+	attr_reader :email_to
+
+	# Who to send announcement emails as
+	attr_accessor :email_from
 
 
 	### Add tasks
@@ -44,9 +51,6 @@ module Hoe::Deveiate
 
 		# Rebuild the ChangeLog immediately before release
 		task :prerelease => 'ChangeLog'
-
-		# Ensure the specs pass before checking in
-		task 'hg:precheckin' => :spec
 
 		### Task: prerelease
 		desc "Append the package build number to package versions"
@@ -79,29 +83,38 @@ module Hoe::Deveiate
 		desc "Send a release announcement to: %p" % [ @email_to ]
 		task :send_email do
 			abort "no email config in your ~/.hoerc" unless defined?( @email_config )
-			@email_from ||= "%s <%s>" % self.developer.first
+
+			@email_from = @email_config['from'] ||= "%s <%s>" % self.developer.first
+			smtp_host = @email_config['host'] || ask( "Email host: " )
+			smtp_port = @email_config['port'] || 'smtp'
+			smtp_port = Socket.getservbyname( smtp_port.to_s )
+			smtp_user = @email_config['user']
 
 			message = generate_email( :full )
-			say "About to send this:"
-			say( mail )
+			say "<%= color 'About to send this email:', :subheader %>"
+			say( message )
 
-			if agree( "Okay to send it? " )
+			if agree( "\n<%= color 'Okay to send it?', :warning %> " )
 				require 'socket'
 				require 'net/smtp'
 				require 'etc'
 
-				username = ask( "Email username: " ) do |q|
+				username = smtp_user || ask( "Email username: " ) do |q|
 					q.default = Etc.getlogin  # default to the current user
 				end
-				password = ask( "Email password: " ) do |q|
-					q.echo = '*'  # Hide the password
+				password = ask( "Email password for #{username}: " ) do |q|
+					q.echo = color( '*', :yellow ) # Hide the password
 				end
 
-				say "Creating SMTP connection to #{SMTP_HOST}:#{SMTP_PORT}"
-				smtp = Net::SMTP.new( SMTP_HOST, SMTP_PORT )
-				smtp.set_debug_output( $stderr )
+				say "Creating SMTP connection to #{smtp_host}:#{smtp_port}"
+				smtp = Net::SMTP.new( smtp_host, smtp_port )
+				smtp.set_debug_output( $stdout )
 				smtp.esmtp = true
-				smtp.enable_starttls
+
+				# Don't verify the server cert, as my server's cert is self-signed
+				ssl_context = OpenSSL::SSL::SSLContext.new
+				ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+				smtp.enable_ssl( ssl_context )
 
 				helo = Socket.gethostname
 				smtp.start( helo, username, password, :plain ) do |smtp|

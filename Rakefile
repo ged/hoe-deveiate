@@ -26,7 +26,7 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 	self.require_ruby_version( '>=1.8.7' )
 	self.rdoc_locations << "deveiate:/usr/local/www/public/code/#{remote_rdoc_dir}"
 
-	self.email_to = 'ged@FaerieMUD.org' if self.respond_to?( :email_to )
+	self.email_to.replace([ 'ged@FaerieMUD.org' ]) if self.respond_to?( :email_to )
 end
 
 ENV['VERSION'] ||= hoespec.spec.version.to_s
