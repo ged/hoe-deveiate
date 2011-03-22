@@ -20,6 +20,7 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 	self.extra_deps.push *{
 		'hoe-highline'  => '~> 0.0',
 		'hoe-mercurial' => '~> 1.0',
+		'tmail'         => '~> 1.2',
 	}
 
 	self.spec_extras[:licenses] = ["BSD"]
