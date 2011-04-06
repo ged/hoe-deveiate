@@ -25,6 +25,8 @@ module Hoe::Deveiate
 
 	### Set up defaults
 	def initialize_deveiate
+		$hoespec = self
+
 		self.hg_sign_tags = true
 
 		@email_to = []
@@ -36,6 +38,8 @@ module Hoe::Deveiate
 			@email_config = config['email']
 			@email_to = Array( @email_config['to'] )
 	    end
+
+		$stderr.puts "Done initializing hoe-deveiate"
 	end
 
 
@@ -49,6 +53,8 @@ module Hoe::Deveiate
 	### Add tasks
 	def define_deveiate_tasks
 
+		task 'hg:precheckin' => [:spec] if File.directory?( 'spec' )
+
 		# Rebuild the ChangeLog immediately before release
 		task :prerelease => 'ChangeLog'
 
@@ -57,10 +63,10 @@ module Hoe::Deveiate
 		task :pre do
 			rev = get_numeric_rev()
 			trace "Current rev is: %p" % [ rev ]
-			hoespec.spec.version.version << "pre#{rev}"
+			$hoespec.spec.version.version << "pre#{rev}"
 			Rake::Task[:gem].clear
 
-			Gem::PackageTask.new( hoespec.spec ) do |pkg|
+			Gem::PackageTask.new( $hoespec.spec ) do |pkg|
 				pkg.need_zip = true
 				pkg.need_tar = true
 			end

@@ -9,6 +9,7 @@ Hoe.plugin :yard
 Hoe.plugin :signing
 Hoe.plugin :deveiate
 
+Hoe.plugins.delete :gemcutter
 Hoe.plugins.delete :rubyforge
 
 hoespec = Hoe.spec 'hoe-deveiate' do
