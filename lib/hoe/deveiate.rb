@@ -17,7 +17,7 @@ require 'hoe/highline'
 module Hoe::Deveiate
 
 	# Library version constant
-	VERSION = '0.0.2'
+	VERSION = '0.0.3'
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
