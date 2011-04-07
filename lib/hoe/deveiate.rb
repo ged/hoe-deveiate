@@ -8,6 +8,8 @@ require 'openssl'
 require 'hoe/mercurial'
 require 'hoe/highline'
 
+Hoe.plugin( :highline, :mercurial )
+
 
 # A collection of Rake tasks and utility functions I use to maintain my
 # Open Source projects.
@@ -33,21 +35,23 @@ module Hoe::Deveiate
 
 	### Set up defaults
 	def initialize_deveiate
-		$hoespec = self
+		unless plugin?( :deveiate )
+			$hoespec = self
 
-		self.hg_sign_tags = true
+			self.hg_sign_tags = true
 
-		@email_to = []
-		@email_from = nil
+			@email_to = []
+			@email_from = nil
 
-	    with_config do |config, _|
-			self.spec_extras[:signing_key] = config['signing_key_file'] or
-				abort "no signing key ('signing_key_file') configured."
-			@email_config = config['email']
-			@email_to = Array( @email_config['to'] )
-	    end
+		    with_config do |config, _|
+				self.spec_extras[:signing_key] = config['signing_key_file'] or
+					abort "no signing key ('signing_key_file') configured."
+				@email_config = config['email']
+				@email_to = Array( @email_config['to'] )
+		    end
 
-		$stderr.puts "Done initializing hoe-deveiate"
+			$stderr.puts "Done initializing hoe-deveiate" if Rake.application.options.trace
+		end
 	end
 
 
