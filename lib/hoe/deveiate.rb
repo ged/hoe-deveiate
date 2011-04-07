@@ -19,7 +19,7 @@ Hoe.plugin( :highline, :mercurial )
 module Hoe::Deveiate
 
 	# Library version constant
-	VERSION = '0.0.3'
+	VERSION = '0.0.4'
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
@@ -35,13 +35,13 @@ module Hoe::Deveiate
 
 	### Set up defaults
 	def initialize_deveiate
+		@email_to ||= []
+		@email_from = nil unless defined?( @email_from )
+
 		unless plugin?( :deveiate )
 			$hoespec = self
 
 			self.hg_sign_tags = true
-
-			@email_to = []
-			@email_from = nil
 
 		    with_config do |config, _|
 				self.spec_extras[:signing_key] = config['signing_key_file'] or
