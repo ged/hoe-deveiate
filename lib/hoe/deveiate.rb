@@ -5,8 +5,8 @@ require 'net/smtp'
 require 'openssl'
 
 # This gem depends on the prompts and stuff from hoe-highline
-Hoe.plugin :highline
-Hoe.plugin :mercurial
+require 'hoe/mercurial'
+require 'hoe/highline'
 
 
 # A collection of Rake tasks and utility functions I use to maintain my
@@ -21,6 +21,14 @@ module Hoe::Deveiate
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
+
+
+	### Extension callback
+	def self::extended( mod )
+		mod.extend( Hoe::Mercurial )
+		mod.extend( Hoe::Highline )
+		super
+	end
 
 
 	### Set up defaults
@@ -59,16 +67,18 @@ module Hoe::Deveiate
 		task :prerelease => 'ChangeLog'
 
 		### Task: prerelease
-		desc "Append the package build number to package versions"
-		task :pre do
-			rev = get_numeric_rev()
-			trace "Current rev is: %p" % [ rev ]
-			$hoespec.spec.version.version << "pre#{rev}"
-			Rake::Task[:gem].clear
+		unless Rake::Task.task_defined?( :pre )
+			desc "Append the package build number to package versions"
+			task :pre do
+				rev = get_numeric_rev()
+				trace "Current rev is: %p" % [ rev ]
+				$hoespec.spec.version.version << "pre#{rev}"
+				Rake::Task[:gem].clear
 
-			Gem::PackageTask.new( $hoespec.spec ) do |pkg|
-				pkg.need_zip = true
-				pkg.need_tar = true
+				Gem::PackageTask.new( $hoespec.spec ) do |pkg|
+					pkg.need_zip = true
+					pkg.need_tar = true
+				end
 			end
 		end
 
