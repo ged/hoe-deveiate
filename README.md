@@ -6,12 +6,13 @@
 ## Description
 
 A collection of Rake tasks and utility functions I use to maintain my Open
-Source projects.
+Source projects. It's really only useful if you want to help maintain one of
+them. 
 
 
 ## Installation
 
-    gem install hoe-deveiate --source http://gems.deveiate.org/
+    gem install hoe-deveiate
 
 
 ## Contributing
