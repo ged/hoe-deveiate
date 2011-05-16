@@ -5,11 +5,8 @@ require 'hoe'
 Hoe.add_include_dirs 'lib'
 
 Hoe.plugin :mercurial
-Hoe.plugin :yard
 Hoe.plugin :signing
-Hoe.plugin :deveiate
 
-Hoe.plugins.delete :gemcutter
 Hoe.plugins.delete :rubyforge
 
 hoespec = Hoe.spec 'hoe-deveiate' do
@@ -18,11 +15,9 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
-	self.extra_deps.push *{
-		'hoe-highline'  => '~> 0.0',
-		'hoe-mercurial' => '~> 1.0',
-		'tmail'         => '~> 1.2',
-	}
+	self.dependency( 'hoe-highline', '~> 0.0' )
+	self.dependency( 'hoe-mercurial', '~> 1.0' )
+	self.dependency( 'tmail', '~> 1.2' )
 
 	self.spec_extras[:licenses] = ["BSD"]
 	self.require_ruby_version( '>=1.8.7' )
