@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
 
+require 'hoe'
 require 'tmail'
 require 'net/smtp'
 require 'openssl'
-
-# This gem depends on the prompts and stuff from hoe-highline
-require 'hoe/mercurial'
-require 'hoe/highline'
 
 Hoe.plugin( :highline, :mercurial )
 
