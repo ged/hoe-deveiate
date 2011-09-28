@@ -16,7 +16,7 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
 	self.dependency( 'hoe-highline', '~> 0.0' )
-	self.dependency( 'hoe-mercurial', '~> 1.0' )
+	self.dependency( 'hoe-mercurial', '~> 1.3' )
 	self.dependency( 'tmail', '~> 1.2' )
 
 	self.spec_extras[:licenses] = ["BSD"]

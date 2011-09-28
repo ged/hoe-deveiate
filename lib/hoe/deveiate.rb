@@ -22,21 +22,15 @@ module Hoe::Deveiate
 	REVISION = %q$Revision$
 
 
-	### Extension callback
-	def self::extended( mod )
-		mod.extend( Hoe::Mercurial )
-		mod.extend( Hoe::Highline )
-		super
-	end
-
-
 	### Set up defaults
 	def initialize_deveiate
 		$hoespec = self
+		abort "requires the hoe-mercurial plugin" unless Hoe.plugins.include?( :mercurial )
 
 		@email_to ||= []
 		@email_from = nil unless defined?( @email_from )
 		self.hg_sign_tags = true
+		self.check_history_on_release = true
 
 	    with_config do |config, _|
 			self.spec_extras[:signing_key] = config['signing_key_file'] or
@@ -60,6 +54,7 @@ module Hoe::Deveiate
 	def define_deveiate_tasks
 
 		task 'hg:precheckin' => [:spec] if File.directory?( 'spec' )
+		task 'hg:prep_release' => :check_manifest
 
 		# Rebuild the ChangeLog immediately before release
 		task :prerelease => 'ChangeLog'
