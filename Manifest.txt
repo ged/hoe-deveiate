@@ -1,5 +1,6 @@
 ChangeLog
 History.md
+Manifest.txt
 README.md
 Rakefile
 lib/hoe/deveiate.rb
