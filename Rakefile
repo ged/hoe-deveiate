@@ -15,9 +15,11 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
-	self.dependency( 'hoe-highline', '~> 0.0' )
-	self.dependency( 'hoe-mercurial', '~> 1.3' )
-	self.dependency( 'tmail', '~> 1.2' )
+	self.dependency 'hoe-highline', '~> 0.0'
+	self.dependency 'hoe-mercurial', '~> 1.3'
+	self.dependency 'tmail', '~> 1.2'
+	self.dependency 'rspec', '~> 2.8'
+	self.dependency 'rdoc', '~> 3.11'
 
 	self.spec_extras[:licenses] = ["BSD"]
 	self.require_ruby_version( '>=1.8.7' )
