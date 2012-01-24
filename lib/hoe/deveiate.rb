@@ -10,9 +10,6 @@ Hoe.plugin( :highline, :mercurial )
 
 # A collection of Rake tasks and utility functions I use to maintain my
 # Open Source projects.
-# 
-# @author Michael Granger <ged@FaerieMUD.org>
-# 
 module Hoe::Deveiate
 
 	# Library version constant
