@@ -10,8 +10,9 @@ Hoe.plugin :signing
 Hoe.plugins.delete :rubyforge
 
 hoespec = Hoe.spec 'hoe-deveiate' do
-	self.readme_file = 'README.md'
-	self.history_file = 'History.md'
+	self.readme_file = 'README.rdoc'
+	self.history_file = 'History.rdoc'
+	self.extra_rdoc_files = Rake::FileList[ '*.rdoc' ]
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 

@@ -1,21 +1,21 @@
-# hoe-deveiate
+= hoe-deveiate
 
 * http://deveiate.org/hoe-deveiate
 
 
-## Description
+== Description
 
 A collection of Rake tasks and utility functions I use to maintain my Open
 Source projects. It's really only useful if you want to help maintain one of
-them. 
+them.
 
 
-## Installation
+== Installation
 
     gem install hoe-deveiate
 
 
-## Contributing
+== Contributing
 
 You can check out the current development source from 
 [my Mercurial repo](http://repo.deveiate.org/hoe-deveiate).
@@ -27,7 +27,7 @@ After checking out the source, run:
 to install any missing dependencies.
 
 
-## License
+== License
 
 Copyright (c) 2011, Michael Granger
 All rights reserved.

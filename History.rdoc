@@ -1,0 +1,18 @@
+== v0.0.8 [2012-01-24] Michael Granger <ged@FaerieMUD.org>
+
+- Add dependencies for rspec and rdoc for one-hit gemset
+- Check history and the manifest before releases.
+
+
+== v0.0.7 [2011-06-03] Michael Granger <ged@FaerieMUD.org>
+
+Removed explicit requires of 'highline' and 'mercurial' to avoid
+constant redefinition warnings.
+
+
+== v0.0.6 [2011-05-16] Michael Granger <ged@FaerieMUD.org>
+
+First tagged release.
+
+
+
