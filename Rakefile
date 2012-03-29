@@ -7,7 +7,7 @@ Hoe.add_include_dirs 'lib'
 Hoe.plugin :mercurial
 Hoe.plugin :signing
 
-Hoe.plugins.delete :publish
+# Hoe.plugins.delete :publish
 Hoe.plugins.delete :rubyforge
 
 hoespec = Hoe.spec 'hoe-deveiate' do
@@ -27,7 +27,6 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 	self.require_ruby_version( '>=1.8.7' )
 	# self.rdoc_locations << "deveiate:/usr/local/www/public/code/#{remote_rdoc_dir}"
 end
-
 
 task :test_email, [:address] do |task, args|
 	args.with_defaults( :address => 'rubymage@gmail.com' )

@@ -81,7 +81,7 @@ module Hoe::Deveiate
 	def define_deveiate_tasks
 
 		task 'hg:precheckin' => [:spec] if File.directory?( 'spec' )
-		task 'hg:prep_release' => :check_manifest
+		task 'hg:prep_release' => [ :check_manifest, :check_history ]
 
 		# Rebuild the ChangeLog immediately before release
 		task :prerelease => 'ChangeLog'
@@ -112,8 +112,10 @@ module Hoe::Deveiate
 			end
 		end
 
-		# Announcement tasks, mostly stolen from hoe-seattlerb
+		# Avoid broken Hoe 3.0 task
+		Rake::Task[:announce].clear
 
+		desc "Announce a new release"
 		task :announce => :send_email
 
 		desc "Send a release announcement to: %p" % [ @email_to ]
