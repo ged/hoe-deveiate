@@ -84,6 +84,7 @@ module Hoe::Deveiate
 		task 'hg:prep_release' => [ :check_manifest, :check_history ]
 
 		# Rebuild the ChangeLog immediately before release
+		task :check_manifest => 'ChangeLog'
 		task :prerelease => 'ChangeLog'
 
 		### Task: prerelease
