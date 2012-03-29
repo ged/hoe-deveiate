@@ -1,0 +1,10 @@
+--- 
+email:
+  to:
+  - ged@FaerieMUD.org
+  - rubymage@gmail.com
+  from: ged@FaerieMUD.org
+  user: ged
+  host: mail.faeriemud.org
+  port: 465
+  tls: true

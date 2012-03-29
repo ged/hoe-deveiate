@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'pry'
 require 'hoe'
-require 'tmail'
-require 'net/smtp'
-require 'openssl'
+require 'mail'
 
 Hoe.plugin( :highline, :mercurial )
 
@@ -86,21 +85,49 @@ module Hoe::Deveiate
 
 		task :announce => :send_email
 
-		desc "Send a release announcement to: %p" % [ @email_to ]
-		task :send_email do
+		def generate_mail
 			abort "no email config in your ~/.hoerc" unless defined?( @email_config )
 
-			@email_from = @email_config['from'] ||= "%s <%s>" % self.developer.first
+		    changes = self.changes
+		    subject = "#{self.name} #{self.version} Released"
+		    title   = "#{self.name} version #{self.version} has been released!"
+		    body    = "#{self.description}\n\nChanges:\n\n#{self.changes}"
+		    urls    = self.urls.map do |url|
+				case url
+				when Array
+					"* <#{url[1].strip}> (#{url[0]})"
+				when String
+					"* <#{url.strip}>"
+				else
+					"* %p" % [ url ]
+				end
+			end
+
+			mail_from = @email_config['from'] || "%s <%s>" % self.developer.first
+			email_to = self.email_to
+
+			return Mail.new do |mail|
+				mail.from    = mail_from
+				mail.to      = email_to.join(", ")
+				mail.subject = "[ANN] #{subject}"
+				mail.body    = [ title, urls.join($/), body ].join( $/ * 2 )
+			end
+		end
+
+
+		desc "Send a release announcement to: %p" % [ @email_to ]
+		task :send_email do
+			mail = generate_mail()
+
+			say "<%= color 'About to send this email:', :subheader %>"
+			say( mail.to_s )
+
 			smtp_host = @email_config['host'] || ask( "Email host: " )
 			smtp_port = @email_config['port'] || 'smtp'
 			smtp_port = Socket.getservbyname( smtp_port.to_s )
 			smtp_user = @email_config['user']
 
-			message = generate_email( :full )
-			say "<%= color 'About to send this email:', :subheader %>"
-			say( message )
-
-			if agree( "\n<%= color 'Okay to send it?', :warning %> " )
+			if agree( "\n<%= color 'Okay to send it?', :warning %> ")
 				require 'socket'
 				require 'net/smtp'
 				require 'etc'
@@ -124,8 +151,11 @@ module Hoe::Deveiate
 
 				helo = Socket.gethostname
 				smtp.start( helo, username, password, :plain ) do |smtp|
-					smtp.send_message( message, self.email_from, *self.email_to )
+					mail.delivery_method( :smtp_connection, :connection => smtp )
+					mail.deliver
 				end
+
+
 			else
 				abort "Okay, aborting."
 			end
