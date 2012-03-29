@@ -19,15 +19,20 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 
 	self.dependency 'hoe-highline', '~> 0.0'
 	self.dependency 'hoe-mercurial', '~> 1.4'
-	self.dependency 'mail', '~> 1.2'
-	self.dependency 'rspec', '~> 2.8'
-	self.dependency 'rdoc', '~> 3.11'
+	self.dependency 'mail', '~> 2.4'
+	self.dependency 'rspec', '~> 2.9'
+	self.dependency 'rdoc', '~> 3.12'
 
 	self.spec_extras[:licenses] = ["BSD"]
 	self.require_ruby_version( '>=1.8.7' )
 	# self.rdoc_locations << "deveiate:/usr/local/www/public/code/#{remote_rdoc_dir}"
+end
 
-	self.email_to.replace([ 'ged@FaerieMUD.org' ]) if self.respond_to?( :email_to )
+
+task :test_email, [:address] do |task, args|
+	args.with_defaults( :address => 'rubymage@gmail.com' )
+	hoespec.email_to.replace([ args.address ])
+	Rake::Task[:send_email].execute
 end
 
 ENV['VERSION'] ||= hoespec.spec.version.to_s

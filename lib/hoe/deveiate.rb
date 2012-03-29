@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'pry'
 require 'hoe'
 require 'mail'
+require 'net/smtp'
+require 'openssl'
 
 Hoe.plugin( :highline, :mercurial )
 
@@ -12,7 +13,7 @@ Hoe.plugin( :highline, :mercurial )
 module Hoe::Deveiate
 
 	# Library version constant
-	VERSION = '0.0.8'
+	VERSION = '0.1.0'
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
@@ -36,6 +37,36 @@ module Hoe::Deveiate
 	    end
 
 		$stderr.puts "Done initializing hoe-deveiate" if Rake.application.options.trace
+	end
+
+
+	def generate_mail
+		$stderr.puts "Generating an announcement email."
+		abort "no email config in your ~/.hoerc" unless defined?( @email_config )
+
+	    changes = self.changes
+	    subject = "#{self.name} #{self.version} Released"
+	    title   = "#{self.name} version #{self.version} has been released!"
+	    body    = "#{self.description}\n\nChanges:\n\n#{self.changes}"
+	    urls    = self.urls.map do |url|
+			case url
+			when Array
+				"* <#{url[1].strip}> (#{url[0]})"
+			when String
+				"* <#{url.strip}>"
+			else
+				"* %p" % [ url ]
+			end
+		end
+
+		$stderr.puts "  returning a new Mail::Message."
+		mail         = Mail.new
+		mail.from    = @email_config['from'] || "%s <%s>" % self.developer.first
+		mail.to      = @email_to.join(", ")
+		mail.subject = "[ANN] #{subject}"
+		mail.body    = [ title, urls.join($/), body ].join( $/ * 2 )
+
+		return mail
 	end
 
 
@@ -84,36 +115,6 @@ module Hoe::Deveiate
 		# Announcement tasks, mostly stolen from hoe-seattlerb
 
 		task :announce => :send_email
-
-		def generate_mail
-			abort "no email config in your ~/.hoerc" unless defined?( @email_config )
-
-		    changes = self.changes
-		    subject = "#{self.name} #{self.version} Released"
-		    title   = "#{self.name} version #{self.version} has been released!"
-		    body    = "#{self.description}\n\nChanges:\n\n#{self.changes}"
-		    urls    = self.urls.map do |url|
-				case url
-				when Array
-					"* <#{url[1].strip}> (#{url[0]})"
-				when String
-					"* <#{url.strip}>"
-				else
-					"* %p" % [ url ]
-				end
-			end
-
-			mail_from = @email_config['from'] || "%s <%s>" % self.developer.first
-			email_to = self.email_to
-
-			return Mail.new do |mail|
-				mail.from    = mail_from
-				mail.to      = email_to.join(", ")
-				mail.subject = "[ANN] #{subject}"
-				mail.body    = [ title, urls.join($/), body ].join( $/ * 2 )
-			end
-		end
-
 
 		desc "Send a release announcement to: %p" % [ @email_to ]
 		task :send_email do

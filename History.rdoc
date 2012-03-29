@@ -1,3 +1,9 @@
+== v0.1.0 [2012-03-29] Michael Granger <ged@FaerieMUD.org>
+
+- Updated for Hoe 3.
+- Replaced tmail with Mail, now that it doesn't require activesupport.
+
+
 == v0.0.8 [2012-01-24] Michael Granger <ged@FaerieMUD.org>
 
 - Add dependencies for rspec and rdoc for one-hit gemset
