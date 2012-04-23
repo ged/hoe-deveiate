@@ -33,7 +33,11 @@ module Hoe::Deveiate
 			self.spec_extras[:signing_key] = config['signing_key_file'] or
 				abort "no signing key ('signing_key_file') configured."
 			@email_config = config['email']
-			@email_to = Array( @email_config['to'] )
+			@email_to = if @email_config
+					Array( @email_config['to'] )
+				else
+					['nobody@nowhere']
+				end
 	    end
 
 		$stderr.puts "Done initializing hoe-deveiate" if Rake.application.options.trace

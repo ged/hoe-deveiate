@@ -1,7 +1,9 @@
 = hoe-deveiate
 
-home  :: http://deveiate.org/hoe-deveiate
-code  :: http://repo.deveiate.org/hoe-deveiate
+home   :: http://deveiate.org/hoe-deveiate
+code   :: http://repo.deveiate.org/hoe-deveiate
+github :: http://github.com/ged/hoe-deveiate.git
+
 
 == Description
 
