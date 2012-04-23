@@ -1,3 +1,8 @@
+== v0.1.1 [2012-04-23] Michael Granger <ged@FaerieMUD.org>
+
+- Fix initialization when the user's .hoerc doesn't have a mail section.
+
+
 == v0.1.0 [2012-03-29] Michael Granger <ged@FaerieMUD.org>
 
 - Updated for Hoe 3.

@@ -13,7 +13,7 @@ Hoe.plugin( :highline, :mercurial )
 module Hoe::Deveiate
 
 	# Library version constant
-	VERSION = '0.1.0'
+	VERSION = '0.1.1'
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
