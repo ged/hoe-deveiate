@@ -44,6 +44,7 @@ module Hoe::Deveiate
 	end
 
 
+	### Generate an announcement email.
 	def generate_mail
 		$stderr.puts "Generating an announcement email."
 		abort "no email config in your ~/.hoerc" unless defined?( @email_config )
@@ -83,6 +84,14 @@ module Hoe::Deveiate
 
 	### Add tasks
 	def define_deveiate_tasks
+		self.define_sanitycheck_tasks
+		self.define_packaging_tasks
+		self.define_announce_tasks
+	end
+
+
+	### Set up some sanity-checks as dependencies of higher-level tasks
+	def define_sanitycheck_tasks
 
 		task 'hg:precheckin' => [:spec] if File.directory?( 'spec' )
 		task 'hg:prep_release' => [ :check_manifest, :check_history ]
@@ -90,6 +99,12 @@ module Hoe::Deveiate
 		# Rebuild the ChangeLog immediately before release
 		task :check_manifest => 'ChangeLog'
 		task :prerelease => 'ChangeLog'
+
+	end
+
+
+	### Set up tasks for use in packaging.
+	def define_packaging_tasks
 
 		### Task: prerelease
 		unless Rake::Task.task_defined?( :pre )
@@ -117,8 +132,14 @@ module Hoe::Deveiate
 			end
 		end
 
+	end
+
+	### Define tasks used to announce new releases
+	def define_announce_tasks
+
 		# Avoid broken Hoe 3.0 task
-		Rake::Task[:announce].clear
+		Rake::Task[:announce].clear if Rake::Task.key?( :announce )
+		Rake::Task[:send_email].clear if Rake::Task.key?( :send_email )
 
 		desc "Announce a new release"
 		task :announce => :send_email
