@@ -1,3 +1,10 @@
+== v0.2.0 [2013-03-03] Michael Granger <ged@FaerieMUD.org>
+
+- Add some quality-checking tasks
+- Update dependencies
+- Split task definitions into smaller functions.
+
+
 == v0.1.1 [2012-04-23] Michael Granger <ged@FaerieMUD.org>
 
 - Fix initialization when the user's .hoerc doesn't have a mail section.
