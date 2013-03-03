@@ -1,4 +1,5 @@
 #!/usr/bin/env rake
+#encoding: utf-8
 
 require 'hoe'
 
@@ -6,22 +7,26 @@ Hoe.add_include_dirs 'lib'
 
 Hoe.plugin :mercurial
 Hoe.plugin :signing
+Hoe.plugin :highline
 
 # Hoe.plugins.delete :publish
 Hoe.plugins.delete :rubyforge
 
-hoespec = Hoe.spec 'hoe-deveiate' do
+
+# The specification
+$hoespec = Hoe.spec 'hoe-deveiate' do
 	self.readme_file = 'README.rdoc'
 	self.history_file = 'History.rdoc'
 	self.extra_rdoc_files = Rake::FileList[ '*.rdoc' ]
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
+	self.dependency 'hoe', '~> 3.5.1'
 	self.dependency 'hoe-highline', '~> 0.0'
 	self.dependency 'hoe-mercurial', '~> 1.4'
-	self.dependency 'mail', '~> 2.4'
-	self.dependency 'rspec', '~> 2.9'
-	self.dependency 'rdoc', '~> 3.12'
+	self.dependency 'mail', '~> 2.5'
+	self.dependency 'rspec', '~> 2.13'
+	self.dependency 'rdoc', '~> 4.0'
 
 	self.spec_extras[:licenses] = ["BSD"]
 	self.require_ruby_version( '>=1.8.7' )
@@ -34,5 +39,5 @@ task :test_email, [:address] do |task, args|
 	Rake::Task[:send_email].execute
 end
 
-ENV['VERSION'] ||= hoespec.spec.version.to_s
+ENV['VERSION'] ||= $hoespec.spec.version.to_s
 
