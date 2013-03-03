@@ -1,4 +1,5 @@
-#!/usr/bin/env ruby
+# -*- ruby -*-
+#encoding: utf-8
 
 require 'hoe'
 require 'mail'
@@ -17,6 +18,12 @@ module Hoe::Deveiate
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
+
+	# Regexp to match trailing whitespace
+	TRAILING_WHITESPACE_RE = /[ \t]+$/
+
+	# Emoji for style advisories
+	SADFACE = "\u{1f622}"
 
 
 	### Set up defaults
@@ -84,9 +91,61 @@ module Hoe::Deveiate
 
 	### Add tasks
 	def define_deveiate_tasks
+		self.define_quality_tasks
 		self.define_sanitycheck_tasks
 		self.define_packaging_tasks
 		self.define_announce_tasks
+	end
+
+
+	### Set up tasks for various code-quality checks.
+	def define_quality_tasks
+		self.define_whitespace_checker_tasks
+
+		# Quality-check before checking in
+		task 'hg:precheckin' => :quality_check
+		task 'git:precheckin' => :quality_check
+
+		desc "Run several quality-checks on the code"
+		task :quality_check => [ :check_whitespace ]
+	end
+
+
+	### Set up tasks that check for poor whitespace discipline
+	def define_whitespace_checker_tasks
+
+		desc "Check source code for inconsistent whitespace"
+		task :check_whitespace => [
+			:check_for_trailing_whitespace,
+			:check_for_mixed_indentation,
+		]
+
+		desc "Check source code for trailing whitespace"
+		task :check_for_trailing_whitespace do
+			lines = find_matching_source_lines do |line, _|
+				line =~ TRAILING_WHITESPACE_RE
+			end
+
+			unless lines.empty?
+				desc = "Found some trailing whitespace"
+				describe_lines_that_need_fixing( desc, lines, TRAILING_WHITESPACE_RE )
+				fail
+			end
+		end
+
+		desc "Check source code for mixed indentation"
+		task :check_for_mixed_indentation do
+			lines = find_matching_source_lines do |line, _|
+				line =~ /([ ]\t)/
+			end
+
+			unless lines.empty?
+				desc = "Found mixed indentation"
+				describe_lines_that_need_fixing( desc, lines, /[ ]\t/ )
+				fail
+			end
+		end
+
 	end
 
 
@@ -138,8 +197,8 @@ module Hoe::Deveiate
 	def define_announce_tasks
 
 		# Avoid broken Hoe 3.0 task
-		Rake::Task[:announce].clear if Rake::Task.key?( :announce )
-		Rake::Task[:send_email].clear if Rake::Task.key?( :send_email )
+		Rake::Task[:announce].clear if Rake::Task.task_defined?( :announce )
+		Rake::Task[:send_email].clear if Rake::Task.task_defined?( :send_email )
 
 		desc "Announce a new release"
 		task :announce => :send_email
@@ -190,6 +249,87 @@ module Hoe::Deveiate
 			end
 		end
 
+	end
+
+
+	# Return tuples of the form:
+	#
+	#   [ <filename>, <line number>, <line> ]
+	#
+	# for every line in the Gemspec's source files for which the block
+	# returns true.
+	def find_matching_source_lines
+		matches = []
+
+		source_files = $hoespec.spec.files.grep( /\.(h|c|rb)$/ )
+
+		source_files.each do |filename|
+			previous_line = nil
+
+			IO.foreach( filename ).with_index do |line, i|
+				matches << [filename, i + 1, line] if yield( line, previous_line )
+				previous_line = line
+			end
+		end
+
+		return matches
+	end
+
+
+	### Output a listing of the specified lines with the given +description+, highlighting
+	### the characters matched by the specified +re+.
+	def describe_lines_that_need_fixing( description, lines, re )
+		say "\n"
+		say SADFACE + "  " + color( "Oh noes! " + description, :header )
+
+		grouped_lines = group_line_matches( lines )
+
+		grouped_lines.each do |filename, linegroups|
+			linegroups.each do |group, lines|
+				if group.min == group.max
+					say color("%s:%d" % [ filename, group.min ], :bold)
+				else
+					say color("%s:%d-%d" % [ filename, group.min, group.max ], :bold)
+				end
+
+				lines.each_with_index do |line, i|
+					say "%s: %s" % [
+						color( group.to_a[i].to_s, :dark, :white ),
+						highlight_problems( line, re )
+					]
+				end
+				say "\n"
+			end
+		end
+	end
+
+
+	# Return a Hash, keyed by filename, whose values are tuples of Ranges
+	# and lines extracted from the given [filename, linenumber, line] +tuples+.
+	def group_line_matches( tuples )
+		by_file = tuples.group_by {|tuple| tuple.first }
+
+		return by_file.each_with_object({}) do |(filename, lines), hash|
+			linegroups = lines.slice_before( [0] ) do |line, last_linenum|
+				rval = line[1] > last_linenum.first.succ
+				last_linenum[0] = line[1]
+				rval
+			end
+
+			hash[filename] = linegroups.map do |group|
+				rng = group.first[1] .. group.last[1]
+				grouplines = group.transpose.last
+				[ rng, grouplines ]
+			end
+		end
+	end
+
+
+	### Transform invisibles in the specified line into visible analogues.
+	def highlight_problems( line, re )
+		line \
+			.gsub( re )    { color $&, :on_red } \
+			.gsub( /\t+/ ) { color "\u{21e5}   " * $&.length, :dark, :white }
 	end
 
 end # module Hoe::Deveiate
