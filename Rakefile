@@ -21,14 +21,14 @@ $hoespec = Hoe.spec 'hoe-deveiate' do
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
-	self.dependency 'hoe', '~> 3.5.1'
+	self.dependency 'hoe', '~> 3.6'
 	self.dependency 'hoe-highline', '~> 0.0'
 	self.dependency 'hoe-mercurial', '~> 1.4'
 	self.dependency 'mail', '~> 2.5'
-	self.dependency 'rspec', '~> 2.13'
+	self.dependency 'rspec', '~> 2.14'
 	self.dependency 'rdoc', '~> 4.0'
 
-	self.spec_extras[:licenses] = ["BSD"]
+	self.license :bsd
 	self.require_ruby_version( '>=1.8.7' )
 	# self.rdoc_locations << "deveiate:/usr/local/www/public/code/#{remote_rdoc_dir}"
 end
@@ -40,4 +40,7 @@ task :test_email, [:address] do |task, args|
 end
 
 ENV['VERSION'] ||= $hoespec.spec.version.to_s
+
+# Ensure the specs pass before checking in
+task 'hg:precheckin' => ['deps:gemset', :check_history, :check_manifest]
 

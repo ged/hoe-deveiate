@@ -5,6 +5,7 @@ require 'hoe'
 require 'mail'
 require 'net/smtp'
 require 'openssl'
+require 'pathname'
 
 Hoe.plugin( :highline, :mercurial )
 
@@ -24,6 +25,9 @@ module Hoe::Deveiate
 
 	# Emoji for style advisories
 	SADFACE = "\u{1f622}"
+
+	# The name of the RVM gemset
+	RVM_GEMSET = Pathname( '.rvm.gems' )
 
 
 	### Set up defaults
@@ -181,6 +185,32 @@ module Hoe::Deveiate
 			end
 		end
 
+		namespace :deps do
+
+			if RVM_GEMSET.exist?
+				desc "Update the project's RVM gemset"
+				task :gemset do
+					deps = make_gemset_recommendations( $hoespec.spec )
+					updates = deps.values.compact
+
+					if !updates.empty?
+						$stderr.puts "%d gems in the current gemset have newer matching versions:" %
+							 [ updates.length ]
+						deps.each do |old, newer|
+							next unless newer
+							$stderr.puts "  #{old} -> #{newer}"
+						end
+
+						if ask( "Update? " )
+							update_rvm_gemset( deps )
+							run 'rvm', 'gemset', 'import', RVM_GEMSET.to_s
+						end
+					end
+				end
+			end
+
+		end
+
 		### Make the ChangeLog update if the repo has changed since it was last built
 		file '.hg/branch'
 		file 'ChangeLog' => '.hg/branch' do |task|
@@ -192,6 +222,60 @@ module Hoe::Deveiate
 		end
 
 	end
+
+
+	### Update the contents of .rvm.gems to include the latest gems.
+	def update_rvm_gemset( deps )
+		RVM_GEMSET.open( File::WRONLY|File::TRUNC, 0644 ) do |fh|
+			deps.sort_by {|dep, _| dep.name }.each do |dep, newer|
+				if newer
+					fh.puts( dep.name + ' -v' + newer.to_s )
+				else
+					mspec = dep.matching_specs.last
+					fh.puts( dep.name + ' -v' + mspec.version.to_s )
+				end
+			end
+		end
+	end
+
+
+	### Print out the list of dependency calls that should be included in the
+	### Hoespec in the Rakefile.
+	def print_hoespec_dependencies( deps )
+		deps.each_key do |dep|
+			$stderr.puts "self.dependency '%s', '%s'" % [ dep.name, dep.version.to_s ]
+		end
+	end
+
+
+	### Return a Hash of Gem::Dependency objects, the keys of which are dependencies
+	### in the current gemspec, and the values are which are either +nil+ if the
+	### current gemset contains the latest version of the gem which matches the
+	### dependency, or the newer version if there is a newer one.
+	def make_gemset_recommendations( gemspec )
+		recommendations = {}
+		fetcher = Gem::SpecFetcher.fetcher
+
+		gemspec.dependencies.each do |dep|
+			newer_dep = nil
+			if (( mspec = dep.matching_specs.last ))
+				newer_dep = Gem::Dependency.new( dep.name, dep.requirement, "> #{mspec.version}" )
+			else
+				newer_dep = Gem::Dependency.new( dep.name, dep.requirement )
+			end
+			remotes, _ = fetcher.search_for_dependency( newer_dep )
+			remotes.map! {|gem, _| gem.version }
+
+			if remotes.empty?
+				recommendations[ dep ] = nil
+			else
+				recommendations[ dep ] = remotes.last
+			end
+		end
+
+		return recommendations
+	end
+
 
 	### Define tasks used to announce new releases
 	def define_announce_tasks

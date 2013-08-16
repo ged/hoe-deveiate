@@ -1,8 +1,6 @@
-# .gems generated gem export file. Note that any env variable settings will be missing. Append these after using a ';' field separator
-hoe -v3.5.1
+hoe -v3.7.0
 hoe-highline -v0.1.0
 hoe-mercurial -v1.4.0
-mail -v2.5.3
-rake -v10.0.3
-rdoc -v4.0.0
-rspec -v2.13.0
+mail -v2.5.4
+rdoc -v4.0.1
+rspec -v2.14.1
