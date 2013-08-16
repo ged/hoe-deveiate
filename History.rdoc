@@ -1,3 +1,9 @@
+== v0.3.0 [2013-08-15] Michael Granger <ged@FaerieMUD.org>
+
+- Add RVM gemset-updating task.
+- Test under Ruby 2 by default
+
+
 == v0.2.0 [2013-03-03] Michael Granger <ged@FaerieMUD.org>
 
 - Add some quality-checking tasks
