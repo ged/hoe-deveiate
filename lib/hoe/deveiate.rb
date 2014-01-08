@@ -6,6 +6,7 @@ require 'mail'
 require 'net/smtp'
 require 'openssl'
 require 'pathname'
+require 'tempfile'
 
 Hoe.plugin( :highline, :mercurial )
 
@@ -226,16 +227,31 @@ module Hoe::Deveiate
 
 	### Update the contents of .rvm.gems to include the latest gems.
 	def update_rvm_gemset( deps )
-		RVM_GEMSET.open( File::WRONLY|File::TRUNC, 0644 ) do |fh|
-			deps.sort_by {|dep, _| dep.name }.each do |dep, newer|
-				if newer
-					fh.puts( dep.name + ' -v' + newer.to_s )
+		tmp = Tempfile.new( 'gemset' )
+		deps.keys.each {|dep| deps[dep.name] = deps.delete(dep) }
+
+		RVM_GEMSET.each_line do |line|
+			if line =~ /^\s*(#|$)/
+				tmp.print( line )
+			else
+				gem, version = line.split( /\s+/, 2 )
+
+				if (( newer = deps.delete(gem) ))
+					tmp.puts( gem + ' -v' + newer.to_s )
 				else
-					mspec = dep.matching_specs.last
-					fh.puts( dep.name + ' -v' + mspec.version.to_s )
+					tmp.print( line )
 				end
 			end
 		end
+
+		deps.each do |gem, newer|
+			next unless newer
+			tmp.puts( gem + ' -v' + newer.to_s )
+		end
+
+		tmp.close
+
+		FileUtils.cp( tmp.path, RVM_GEMSET, :verbose => true )
 	end
 
 
@@ -258,11 +274,13 @@ module Hoe::Deveiate
 
 		gemspec.dependencies.each do |dep|
 			newer_dep = nil
+
 			if (( mspec = dep.matching_specs.last ))
 				newer_dep = Gem::Dependency.new( dep.name, dep.requirement, "> #{mspec.version}" )
 			else
 				newer_dep = Gem::Dependency.new( dep.name, dep.requirement )
 			end
+
 			remotes, _ = fetcher.search_for_dependency( newer_dep )
 			remotes.map! {|gem, _| gem.version }
 
