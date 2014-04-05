@@ -36,6 +36,10 @@ module Hoe::Deveiate
 		$hoespec = self
 		abort "requires the hoe-mercurial plugin" unless Hoe.plugins.include?( :mercurial )
 
+		minor_version = VERSION[ /^\d+\.\d+/ ]
+		self.extra_dev_deps << ['hoe-deveiate', "~> #{minor_version}"] unless
+			self.name == 'hoe-deveiate'
+
 		@email_to ||= []
 		@email_from = nil unless defined?( @email_from )
 		self.hg_sign_tags = true
@@ -51,6 +55,8 @@ module Hoe::Deveiate
 					['nobody@nowhere']
 				end
 	    end
+
+		@quality_check_whitelist = Rake::FileList.new
 
 		$stderr.puts "Done initializing hoe-deveiate" if Rake.application.options.trace
 	end
@@ -92,6 +98,10 @@ module Hoe::Deveiate
 
 	# Who to send announcement emails as
 	attr_accessor :email_from
+
+	# The Rake::FileList that contains files that shouldn't be considered when doing
+	# quality checks
+	attr_reader :quality_check_whitelist
 
 
 	### Add tasks
@@ -364,6 +374,7 @@ module Hoe::Deveiate
 		matches = []
 
 		source_files = $hoespec.spec.files.grep( /\.(h|c|rb)$/ )
+		source_files -= self.quality_check_whitelist
 
 		source_files.each do |filename|
 			previous_line = nil
