@@ -1,3 +1,8 @@
+== v0.6.0 [2014-04-05] Michael Granger <ged@FaerieMUD.org>
+
+Update to RSpec 3.
+
+
 == v0.5.0 [2014-04-05] Michael Granger <ged@FaerieMUD.org>
 
 - Add a whitelist for the quality-check for generated files, etc.
