@@ -1,9 +1,10 @@
 #!/usr/bin/env rake
 #encoding: utf-8
 
-require 'hoe'
+$LOAD_PATH.unshift 'lib'
 
-Hoe.add_include_dirs 'lib'
+require 'hoe'
+require 'hoe/deveiate'
 
 Hoe.plugin :mercurial
 Hoe.plugin :signing
@@ -22,12 +23,12 @@ $hoespec = Hoe.spec 'hoe-deveiate' do
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
-	self.dependency 'hoe', '~> 3.12'
+	self.dependency 'hoe', '~> 3.13'
 	self.dependency 'hoe-highline', '~> 0.2'
 	self.dependency 'hoe-mercurial', '~> 1.4'
 	self.dependency 'mail', '~> 2.6'
-	self.dependency 'rspec', '~> 3.0'
-	self.dependency 'rdoc', '~> 4.1'
+	self.dependency 'rspec', '~> 3.2'
+	self.dependency 'rdoc', '~> 4.2'
 
 	self.license 'BSD'
 	self.require_ruby_version( '>=2.0.0' )

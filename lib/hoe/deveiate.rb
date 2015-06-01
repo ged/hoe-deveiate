@@ -28,7 +28,7 @@ module Hoe::Deveiate
 	SADFACE = "\u{1f622}"
 
 	# The name of the RVM gemset
-	RVM_GEMSET = Pathname( '.rvm.gems' )
+	RVM_GEMSET = Pathname( '.gems' )
 
 
 	### Set up defaults
@@ -151,7 +151,7 @@ module Hoe::Deveiate
 		desc "Check source code for mixed indentation"
 		task :check_for_mixed_indentation do
 			lines = find_matching_source_lines do |line, _|
-				line =~ /([ ]\t)/
+				line =~ /(?<!#)([ ]\t)/
 			end
 
 			unless lines.empty?
