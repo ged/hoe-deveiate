@@ -30,8 +30,8 @@ $hoespec = Hoe.spec 'hoe-deveiate' do
 	self.dependency 'rspec', '~> 3.2'
 	self.dependency 'rdoc', '~> 4.2'
 
-	self.license 'BSD'
-	self.require_ruby_version( '>=2.0.0' )
+	self.license 'BSD-3-Clause'
+	self.require_ruby_version( '>=2.2.0' )
 	# self.rdoc_locations << "deveiate:/usr/local/www/public/code/#{remote_rdoc_dir}"
 end
 

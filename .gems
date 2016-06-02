@@ -1,6 +1,6 @@
-hoe -v '~> 3.13'
+hoe -v3.15.0
 hoe-highline -v '~> 0.2'
 hoe-mercurial -v '~> 1.4'
-mail -v '~> 2.6'
+mail -v2.6.4
 rdoc -v '~> 4.2'
 rspec -v '~> 3.2'

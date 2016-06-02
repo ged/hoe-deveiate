@@ -1,6 +1,8 @@
 # -*- ruby -*-
 #encoding: utf-8
 
+require 'pp'
+
 require 'hoe'
 require 'mail'
 require 'net/smtp'
@@ -16,7 +18,7 @@ Hoe.plugin( :highline, :mercurial )
 module Hoe::Deveiate
 
 	# Library version constant
-	VERSION = '0.7.0'
+	VERSION = '0.8.0'
 
 	# Version-control revision constant
 	REVISION = %q$Revision$
@@ -423,13 +425,14 @@ module Hoe::Deveiate
 		by_file = tuples.group_by {|tuple| tuple.first }
 
 		return by_file.each_with_object({}) do |(filename, lines), hash|
-			linegroups = lines.slice_before( [0] ) do |line, last_linenum|
-				rval = line[1] > last_linenum.first.succ
-				last_linenum[0] = line[1]
-				rval
+			last_linenum = 0
+			linegroups = lines.slice_before do |filename, linenum|
+				gap = linenum > last_linenum + 1
+				last_linenum = linenum
+				gap
 			end
 
-			hash[filename] = linegroups.map do |group|
+			hash[ filename ] = linegroups.map do |group|
 				rng = group.first[1] .. group.last[1]
 				grouplines = group.transpose.last
 				[ rng, grouplines ]
