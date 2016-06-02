@@ -1,3 +1,8 @@
+== v0.8.0 [2016-06-01] Michael Granger <ged@FaerieMUD.org>
+
+- Update quality check class for Ruby 2.3.
+
+
 == v0.7.0 [2015-06-01] Michael Granger <ged@FaerieMUD.org>
 
 - Update deps, rename gemset import file RVM default.
