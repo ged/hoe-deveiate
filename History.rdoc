@@ -1,3 +1,11 @@
+==  v0.9.0 [2017-03-10] Michael Granger <ged@FaerieMUD.org>
+
+Enhancements:
+
+- Update dev dependencies
+- SSL -> STARTTLS, turn cert verification on
+
+
 == v0.8.0 [2016-06-01] Michael Granger <ged@FaerieMUD.org>
 
 - Update quality check class for Ruby 2.3.

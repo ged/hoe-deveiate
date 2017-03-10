@@ -28,7 +28,7 @@ hoespec = Hoe.spec 'hoe-deveiate' do
 	self.dependency 'hoe-mercurial', '~> 1.4'
 	self.dependency 'mail', '~> 2.6'
 	self.dependency 'rspec', '~> 3.5'
-	self.dependency 'rdoc', '~> 5.0'
+	self.dependency 'rdoc', '~> 5.1'
 
 	self.license 'BSD-3-Clause'
 	self.require_ruby_version( '>=2.2.0' )
