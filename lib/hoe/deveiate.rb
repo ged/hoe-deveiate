@@ -346,10 +346,8 @@ module Hoe::Deveiate
 				smtp.set_debug_output( $stdout )
 				smtp.esmtp = true
 
-				# Don't verify the server cert, as my server's cert is self-signed
 				ssl_context = OpenSSL::SSL::SSLContext.new
-				ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
-				smtp.enable_ssl( ssl_context )
+				smtp.enable_starttls( ssl_context )
 
 				helo = Socket.gethostname
 				smtp.start( helo, username, password, :plain ) do |smtp|
