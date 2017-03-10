@@ -16,19 +16,19 @@ Hoe.plugins.delete :rubyforge
 GEMSPEC = 'hoe-deveiate.gemspec'
 
 # The specification
-$hoespec = Hoe.spec 'hoe-deveiate' do
+hoespec = Hoe.spec 'hoe-deveiate' do
 	self.readme_file = 'README.rdoc'
 	self.history_file = 'History.rdoc'
 	self.extra_rdoc_files = Rake::FileList[ '*.rdoc' ]
 
 	self.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
-	self.dependency 'hoe', '~> 3.13'
+	self.dependency 'hoe', '~> 3.16'
 	self.dependency 'hoe-highline', '~> 0.2'
 	self.dependency 'hoe-mercurial', '~> 1.4'
 	self.dependency 'mail', '~> 2.6'
-	self.dependency 'rspec', '~> 3.2'
-	self.dependency 'rdoc', '~> 4.2'
+	self.dependency 'rspec', '~> 3.5'
+	self.dependency 'rdoc', '~> 5.0'
 
 	self.license 'BSD-3-Clause'
 	self.require_ruby_version( '>=2.2.0' )
@@ -50,7 +50,7 @@ task 'hg:precheckin' => ['deps:gemset', :check_history, :check_manifest]
 # Generate a .gemspec file for integration with systems that read it
 task :gemspec => GEMSPEC
 file GEMSPEC => __FILE__ do |task|
-	spec = $hoespec.spec
+	spec = hoespec.spec
 	spec.files.delete( '.gemtest' )
 	spec.version = "#{spec.version}.pre#{Time.now.strftime("%Y%m%d%H%M%S")}"
 	File.open( task.name, 'w' ) do |fh|
